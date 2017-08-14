@@ -297,7 +297,7 @@ class Squad
       def show(&block);    @request_methods['GET']    = block end
       def create(&block);  @request_methods['POST']   = block end
       def update(&block);  @request_methods['PUT']    = block end
-      def destory(&block); @request_methods['DELETE'] = block end
+      def destroy(&block); @request_methods['DELETE'] = block end
 
       def default_actions
         @request_methods = {}
@@ -325,7 +325,7 @@ class Squad
           save
         end
 
-        destory { |params| delete }
+        destroy { |params| delete }
       end
   end
 
