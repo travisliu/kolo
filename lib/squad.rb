@@ -338,9 +338,8 @@ class Squad
     end
 
     def each
-      @ids.each { |id| @resource.redis.queue("HGETALL", @resource.key[id])}
+      data = @ids.map { |id| @resource.redis.call("HGETALL", @resource.key[id])}
 
-      data = @resource.redis.commit
       return if data.nil?
 
       data.each_with_index do |atts, idx|
