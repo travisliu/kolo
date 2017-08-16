@@ -119,7 +119,7 @@ class Squad
     def render(request)
       raise NotImplementedError unless method_block = @request_methods[request.request_method]
       load! unless id.nil?
-      instance_exec(request) { |request| process_request request }
+      instance_exec(request) { |request| process_request request if defined? process_request }
       execute(request.params, &method_block)    
     end
 
@@ -297,7 +297,7 @@ class Squad
       def show(&block);    @request_methods['GET']    = block end
       def create(&block);  @request_methods['POST']   = block end
       def update(&block);  @request_methods['PUT']    = block end
-      def destory(&block); @request_methods['DELETE'] = block end
+      def destroy(&block); @request_methods['DELETE'] = block end
 
       def default_actions
         @request_methods = {}
@@ -325,7 +325,7 @@ class Squad
           save
         end
 
-        destory { |params| delete }
+        destroy { |params| delete }
       end
   end
 
@@ -338,9 +338,8 @@ class Squad
     end
 
     def each
-      @ids.each { |id| @resource.redis.queue("HGETALL", @resource.key[id])}
+      data = @ids.map { |id| @resource.redis.call("HGETALL", @resource.key[id])}
 
-      data = @resource.redis.commit
       return if data.nil?
 
       data.each_with_index do |atts, idx|
